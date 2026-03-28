@@ -1,22 +1,20 @@
 # Minimal recommendations
 
-These are the short practical recommendations I’d make based on the current OpenClaw docs and your usage pattern.
-
 ## Good defaults
 
 - keep the compose file simple and close to upstream
 - use a dedicated `.env.openclaw`
 - use token auth on the gateway
-- keep DM access on `pairing`
+- keep DMs on `pairing`
 - keep group access on `allowlist`
 - mount only the project workspace and persistent OpenClaw state
 
 ## Useful out-of-the-box additions
 
 - enable audio transcription with a provider-backed default
-- provide a starter multi-agent split (`main`, `frontend`, `backend`, `reviewer`)
-- leave channel providers disabled until the user fills in tokens
-- document qmd-related env hints, but don’t force them on everyone
+- provide a small agent split (`main`, `frontend`, `backend`, `reviewer`)
+- leave channel providers disabled until the user adds credentials
+- document optional qmd/speech env hints without forcing them on everyone
 
 ## Things not worth enabling by default
 
@@ -25,7 +23,7 @@ These are the short practical recommendations I’d make based on the current Op
 - broad public exposure
 - lots of channel integrations at once
 
-## Practical rollout advice
+## Rollout advice
 
 Start with:
 

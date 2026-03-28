@@ -45,13 +45,13 @@ Next steps:
   1. Edit .env.openclaw and add any provider/channel secrets you need
   2. Review openclaw/openclaw.json
   3. Start OpenClaw:
-     docker compose --env-file .env.openclaw -f compose.openclaw.yaml --profile openclaw up -d
+     docker compose -f compose.openclaw.yaml up -d
   4. Open a shell:
-     docker compose --env-file .env.openclaw -f compose.openclaw.yaml run --rm openclaw-cli bash
+     docker compose -f compose.openclaw.yaml exec openclaw bash
   5. Inside the container, run:
      openclaw doctor
      openclaw onboard
 
-Optional SSH mount:
-  docker compose --env-file .env.openclaw -f compose.openclaw.yaml -f compose.openclaw.ssh.yaml --profile openclaw --profile openclaw-ssh up -d
+Optional SSH-enabled service:
+  docker compose -f compose.openclaw.yaml --profile ssh up -d openclaw-ssh
 EOF

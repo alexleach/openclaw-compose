@@ -1,10 +1,10 @@
 // OpenClaw starter config for a project-local Docker deployment.
 // Copy to openclaw/openclaw.json and customize.
+// Note: OpenClaw config supports comments and relaxed JSON-style syntax.
 // Docs: https://docs.openclaw.ai/gateway/configuration
 
 {
   gateway: {
-    // Keep auth enabled when exposing the gateway beyond loopback.
     bind: "auto",
     mode: "local",
     auth: {
@@ -87,7 +87,7 @@
         name: "Reviewer",
         workspace: "/home/node/.openclaw/workspace-reviewer",
         model: { primary: "anthropic/claude-sonnet-4-6" },
-      }
+      },
     ],
   },
 
@@ -96,10 +96,8 @@
       audio: {
         enabled: true,
         maxBytes: 20971520,
-        // Provider-based STT works well as a portable default.
-        // Example alternatives: Deepgram, Gemini, or a local CLI fallback.
+        // Provider-based STT is a practical portable default.
         models: [{ provider: "openai", model: "gpt-4o-mini-transcribe" }],
-        // Echoing the transcript can be handy, but it may be noisy in some chats.
         echoTranscript: false,
       },
     },
@@ -116,7 +114,7 @@
     },
   },
 
-  // Optional provider examples.
+  // Optional provider example.
   // Uncomment and adapt if you use Azure-hosted OpenAI-compatible models.
   // models: {
   //   providers: {

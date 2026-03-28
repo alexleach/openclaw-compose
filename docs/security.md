@@ -2,12 +2,11 @@
 
 ## Defaults in this starter
 
-This template intentionally does **not** include:
+This template does **not** enable by default:
 
 - Docker socket access
-- browser-heavy dependencies
-- hard-coded API keys
-- hard-coded bot tokens
+- browser-heavy extras
+- hard-coded API keys or bot tokens
 - public unauthenticated gateway access
 
 It also starts with a few conservative OpenClaw config choices:
@@ -26,39 +25,28 @@ Do not commit them into:
 - `compose.openclaw.yaml`
 - `openclaw/openclaw.json`
 - README examples
-- devcontainer examples
+- other checked-in docs or helper files
 
-## Minimal secure-by-default recommendations
+## Minimum secure defaults
 
-These are the sensible low-friction defaults from the current OpenClaw docs:
+1. keep gateway auth enabled
+2. prefer pairing for DMs
+3. prefer allowlists for groups/channels
+4. gate risky device/node actions unless you need them
+5. do not commit channel tokens or model-provider keys
+6. avoid Docker socket access by default
+7. only expose the gateway deliberately
 
-1. **Keep gateway auth enabled**
-   - if the gateway binds beyond loopback, use a strong token
-2. **Prefer pairing for DMs**
-   - unknown senders should not get direct access by default
-3. **Prefer allowlists for groups/channels**
-   - especially on Discord, Telegram, Matrix, and Slack
-4. **Disable risky device/node actions unless you need them**
-   - camera, screen recording, and write-actions are worth gating
-5. **Do not commit channel tokens or provider keys**
-   - obvious, but still the most common failure mode
-6. **Avoid enabling Docker socket access by default**
-   - it is a major trust-boundary expansion
-7. **Only enable public exposure deliberately**
-   - if later using Tailscale Serve/Funnel or other ingress, review auth again
+## Gateway token
 
-## Token requirement
-
-Generate a gateway token with:
+Generate a token with:
 
 ```bash
 openssl rand -hex 32
 ```
 
-## Notes on remote exposure
+## If exposing the gateway remotely
 
-If you later expose the gateway remotely:
-
-- keep token/password auth on
-- prefer Tailscale or another authenticated tunnel
+- keep token or password auth enabled
+- prefer an authenticated tunnel such as Tailscale
 - do not rely on obscurity or a high port alone

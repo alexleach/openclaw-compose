@@ -1,30 +1,22 @@
 # Secrets and separation of concerns
 
-You raised a fair point: OpenClaw secrets are not always the same concern as the host application's own runtime secrets.
-
-## Recommendation
-
-Use a dedicated `.env.openclaw` file for the OpenClaw overlay repository.
+Use a dedicated `.env.openclaw` file for the OpenClaw overlay.
 
 That keeps:
 
-- project application env separate from
-- OpenClaw gateway / model / channel env
+- app/runtime secrets separate from
+- OpenClaw gateway, model, and channel secrets
 
-If you embed this overlay directly inside another repository, keep the naming explicit so the boundary stays obvious.
-Examples:
+## Why this helps
+
+- avoids accidental secret reuse across containers
+- makes rotation easier
+- reduces accidental leakage when open-sourcing
+- keeps the assistant/tooling boundary obvious
+
+## Suggested naming
 
 - `.env.openclaw`
 - `.env.openclaw.local`
-- `docker compose --env-file .env.openclaw ...`
 
-## Why this is better
-
-- avoids mixing application secrets with assistant/tooling secrets
-- makes rotation easier
-- reduces accidental reuse in app containers
-- makes open-sourcing safer
-
-## Practical note
-
-This starter uses `.env.openclaw` as the recommended default so the OpenClaw boundary stays explicit.
+If you embed this overlay inside another repository, keep the naming explicit so the boundary stays clear.

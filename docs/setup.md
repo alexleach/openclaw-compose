@@ -3,7 +3,7 @@
 ## Standalone
 
 ```bash
-cp .env.openclaw.example .env.openclaw
+./scripts/bootstrap.sh
 docker compose -f compose.openclaw.yaml up -d
 ```
 
@@ -23,7 +23,7 @@ docker compose -f compose.yaml -f compose.openclaw.yaml exec openclaw bash
 
 ## SSH profile
 
-The compose file uses a YAML anchor for the shared OpenClaw service definition, then adds an SSH-enabled variant under the `ssh` profile.
+The compose file uses a shared OpenClaw service definition plus an SSH-enabled variant under the `ssh` profile.
 
 If you want the container to have access to SSH keys too:
 
@@ -40,7 +40,7 @@ openclaw onboard
 
 ## What is preconfigured in the starter
 
-The sample `openclaw/openclaw.json.example` already includes:
+The sample `openclaw/openclaw.json.example` includes:
 
 - token auth on the gateway
 - a conservative device/node deny-list
@@ -51,6 +51,4 @@ The sample `.env.openclaw.example` also includes optional qmd and speech-related
 
 ## Host project visibility
 
-The host repo is mounted at `/workspace`.
-
-That means OpenClaw can work directly against the checked-out project without copying source into the state volume.
+The host repo is mounted at `/workspace`, so OpenClaw can work directly against the checked-out project without copying source into the state volume.
