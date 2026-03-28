@@ -1,0 +1,73 @@
+// OpenClaw starter config for a project-local Docker deployment.
+// Copy to openclaw/openclaw.json and customize.
+// Docs: https://docs.openclaw.ai/gateway/configuration
+
+{
+  gateway: {
+    bind: "lan",
+    auth: {
+      mode: "token",
+      token: "${OPENCLAW_GATEWAY_TOKEN}",
+    },
+  },
+
+  session: {
+    dmScope: "per-channel-peer",
+    threadBindings: {
+      enabled: true,
+      idleHours: 24,
+      maxAgeHours: 0,
+    },
+    reset: {
+      mode: "daily",
+      atHour: 4,
+      idleMinutes: 120,
+    },
+  },
+
+  agents: {
+    defaults: {
+      workspace: "/workspace",
+      model: {
+        primary: "openai/gpt-5.4",
+        fallbacks: ["anthropic/claude-sonnet-4-6"],
+      },
+      models: {
+        "openai/gpt-5.4": { alias: "GPT-5.4" },
+        "anthropic/claude-sonnet-4-6": { alias: "Sonnet" },
+      },
+    },
+    list: [
+      {
+        id: "main",
+        name: "Main",
+      },
+      {
+        id: "frontend",
+        name: "Frontend",
+        model: { primary: "openai/gpt-5.4" },
+      },
+      {
+        id: "backend",
+        name: "Backend",
+        model: { primary: "openai/gpt-5.4" },
+      },
+      {
+        id: "reviewer",
+        name: "Reviewer",
+        model: { primary: "anthropic/claude-sonnet-4-6" },
+      }
+    ],
+  },
+
+  channels: {
+    discord: {
+      enabled: false,
+      dmPolicy: "pairing",
+    },
+    telegram: {
+      enabled: false,
+      dmPolicy: "pairing",
+    },
+  },
+}

@@ -1,0 +1,15 @@
+.env.openclaw
+.env.openclaw.local
+.env.*.local
+!.env.openclaw.example
+
+openclaw/openclaw.json
+openclaw/openclaw.json5
+openclaw/state/
+openclaw/logs/
+openclaw/sessions/
+openclaw/media/
+openclaw/tmp/
+
+*.log
+.DS_Store

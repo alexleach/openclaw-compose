@@ -1,0 +1,101 @@
+name: openclaw-compose
+
+services:
+  openclaw-gateway:
+    image: ${OPENCLAW_IMAGE:-ghcr.io/openclaw/openclaw:latest}
+    profiles: ["openclaw"]
+    restart: unless-stopped
+    init: true
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      TZ: ${OPENCLAW_TZ:-UTC}
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:?set OPENCLAW_GATEWAY_TOKEN in .env}
+      OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: ${OPENCLAW_ALLOW_INSECURE_PRIVATE_WS:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+    volumes:
+      - openclaw_state:/home/node/.openclaw
+      - ${OPENCLAW_PROJECT_DIR:-.}:/workspace
+      - ${OPENCLAW_SEED_DIR:-./openclaw}:/seed/openclaw:ro
+    ports:
+      - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
+      - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
+    command:
+      [
+        "node",
+        "openclaw.mjs",
+        "gateway",
+        "--allow-unconfigured",
+        "--bind",
+        "${OPENCLAW_GATEWAY_BIND:-lan}",
+        "--port",
+        "18789"
+      ]
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  openclaw-cli:
+    image: ${OPENCLAW_IMAGE:-ghcr.io/openclaw/openclaw:latest}
+    profiles: ["openclaw"]
+    depends_on:
+      - openclaw-gateway
+    network_mode: service:openclaw-gateway
+    init: true
+    stdin_open: true
+    tty: true
+    cap_drop:
+      - NET_RAW
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      TZ: ${OPENCLAW_TZ:-UTC}
+      BROWSER: echo
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:?set OPENCLAW_GATEWAY_TOKEN in .env}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    volumes:
+      - openclaw_state:/home/node/.openclaw
+      - ${OPENCLAW_PROJECT_DIR:-.}:/workspace
+      - ${OPENCLAW_SEED_DIR:-./openclaw}:/seed/openclaw:ro
+    entrypoint: ["bash", "-lc"]
+    command: "exec bash"
+
+  openclaw-browser:
+    image: ${OPENCLAW_IMAGE:-ghcr.io/openclaw/openclaw:latest}
+    profiles: ["openclaw-browser"]
+    depends_on:
+      - openclaw-gateway
+    network_mode: service:openclaw-gateway
+    init: true
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      TZ: ${OPENCLAW_TZ:-UTC}
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:?set OPENCLAW_GATEWAY_TOKEN in .env}
+    volumes:
+      - openclaw_state:/home/node/.openclaw
+      - ${OPENCLAW_PROJECT_DIR:-.}:/workspace
+    entrypoint: ["bash", "-lc"]
+    command: "echo 'Use an image built with browser dependencies for browser automation.' && sleep infinity"
+
+volumes:
+  openclaw_state:
+    name: ${OPENCLAW_STATE_VOLUME:-openclaw_state}

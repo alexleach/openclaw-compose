@@ -1,0 +1,10 @@
+services:
+  openclaw-gateway:
+    profiles: ["openclaw", "openclaw-ssh"]
+    volumes:
+      - ${OPENCLAW_SSH_DIR:-${HOME}/.ssh}:/home/node/.ssh:ro
+
+  openclaw-cli:
+    profiles: ["openclaw", "openclaw-ssh"]
+    volumes:
+      - ${OPENCLAW_SSH_DIR:-${HOME}/.ssh}:/home/node/.ssh:ro
