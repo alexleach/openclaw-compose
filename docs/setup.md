@@ -4,7 +4,7 @@
 
 ```bash
 cp .env.openclaw.example .env.openclaw
-docker compose --env-file .env.openclaw -f compose.openclaw.yaml --profile openclaw up -d
+docker compose -f compose.openclaw.yaml up -d
 ```
 
 ## As an overlay in an existing project
@@ -12,16 +12,24 @@ docker compose --env-file .env.openclaw -f compose.openclaw.yaml --profile openc
 If your project already has a `compose.yaml` or `compose.dev.yaml`, layer this file on top:
 
 ```bash
-docker compose --env-file .env.openclaw -f compose.yaml -f compose.openclaw.yaml --profile openclaw up -d openclaw-gateway
+docker compose -f compose.yaml -f compose.openclaw.yaml up -d openclaw
 ```
 
-Then open the CLI container:
+Then open a shell in the running container:
 
 ```bash
-docker compose --env-file .env.openclaw -f compose.yaml -f compose.openclaw.yaml run --rm openclaw-cli bash
+docker compose -f compose.yaml -f compose.openclaw.yaml exec openclaw bash
 ```
 
-## Suggested first-run steps inside the CLI container
+## SSH profile
+
+If you want the container to have access to SSH keys too:
+
+```bash
+docker compose -f compose.openclaw.yaml --profile ssh up -d openclaw-ssh
+```
+
+## Suggested first-run steps inside the container
 
 ```bash
 openclaw doctor

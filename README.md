@@ -14,10 +14,21 @@ It is designed to:
 - provide a clean first-run bootstrap path
 - stay safe by default
 
+## Design choices
+
+This starter now stays intentionally close to the upstream OpenClaw image:
+
+- no custom `command`
+- no custom `healthcheck`
+- no extra `HOME` / `TERM` / `TZ` defaults
+- no separate CLI sidecar by default
+- one main service, plus an SSH-profile variant when you explicitly want key access
+
+That keeps the compose file smaller and avoids fighting upstream container behavior.
+
 ## Repository layout
 
 - `compose.openclaw.yaml` — main Compose overlay
-- `compose.openclaw.ssh.yaml` — optional SSH mount overlay
 - `.env.openclaw.example` — environment template
 - `scripts/bootstrap.sh` — first-run bootstrap helper
 - `openclaw/openclaw.json.example` — starter OpenClaw config
@@ -44,13 +55,13 @@ Edit `.env.openclaw` and add whichever provider or channel credentials you actua
 ### 3. Start OpenClaw
 
 ```bash
-docker compose --env-file .env.openclaw -f compose.openclaw.yaml --profile openclaw up -d
+docker compose -f compose.openclaw.yaml up -d
 ```
 
-### 4. Open the CLI container
+### 4. Open a shell in the running container
 
 ```bash
-docker compose --env-file .env.openclaw -f compose.openclaw.yaml run --rm openclaw-cli bash
+docker compose -f compose.openclaw.yaml exec openclaw bash
 ```
 
 ### 5. Finish onboarding
@@ -67,14 +78,43 @@ openclaw onboard
 If the target project already has its own Compose file:
 
 ```bash
-docker compose --env-file .env.openclaw -f compose.yaml -f compose.openclaw.yaml --profile openclaw up -d openclaw-gateway
+docker compose -f compose.yaml -f compose.openclaw.yaml up -d openclaw
 ```
 
-If you want SSH available inside the OpenClaw containers too:
+If you want SSH available inside the OpenClaw container too:
 
 ```bash
-docker compose --env-file .env.openclaw -f compose.yaml -f compose.openclaw.yaml -f compose.openclaw.ssh.yaml --profile openclaw --profile openclaw-ssh up -d
+docker compose -f compose.openclaw.yaml --profile ssh up -d openclaw-ssh
 ```
+
+Or when layering onto another project:
+
+```bash
+docker compose -f compose.yaml -f compose.openclaw.yaml --profile ssh up -d openclaw-ssh
+```
+
+## Why the earlier version had extra pieces
+
+Your comments were fair. The first draft was more defensive than necessary.
+
+- `init: true` adds a tiny init process for signal handling and zombie reaping. Useful sometimes, but not essential here.
+- a separate CLI container only really helps if you want shared-network localhost access while keeping the main service immutable.
+- a third browser-oriented service was overkill for this project.
+
+For this starter, simpler is better.
+
+## env_file vs --env-file
+
+I agree with you that service-level `env_file` is cleaner here.
+
+This repo now uses:
+
+```yaml
+env_file:
+  - ./.env.openclaw
+```
+
+That means you usually do **not** need to pass `--env-file` on the command line.
 
 ## State model
 
@@ -84,23 +124,6 @@ This setup intentionally separates:
 - **project source** mounted from the host into `/workspace`
 
 That gives you durable sessions/config without copying your actual source tree into the OpenClaw state volume.
-
-## Recommended secret boundary
-
-You were right to question whether OpenClaw secrets belong in the same env file as the host application.
-
-For a real project, I recommend using a dedicated env file such as:
-
-- `.env.openclaw`
-- `.env.openclaw.local`
-
-Then run Compose with:
-
-```bash
-docker compose --env-file .env.openclaw -f compose.openclaw.yaml --profile openclaw up -d
-```
-
-This starter uses `.env.openclaw` as the default boundary so OpenClaw secrets stay clearly separate from the host application's own env.
 
 ## Suggested agent layout for full-stack projects
 
