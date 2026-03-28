@@ -4,10 +4,27 @@
 
 {
   gateway: {
-    bind: "lan",
+    // Keep auth enabled when exposing the gateway beyond loopback.
+    bind: "auto",
+    mode: "local",
     auth: {
       mode: "token",
       token: "${OPENCLAW_GATEWAY_TOKEN}",
+    },
+    tailscale: {
+      mode: "off",
+      resetOnExit: false,
+    },
+    // Conservative defaults for node/device actions.
+    nodes: {
+      denyCommands: [
+        "camera.snap",
+        "camera.clip",
+        "screen.record",
+        "calendar.add",
+        "contacts.add",
+        "reminders.add",
+      ],
     },
   },
 
@@ -36,38 +53,104 @@
         "openai/gpt-5.4": { alias: "GPT-5.4" },
         "anthropic/claude-sonnet-4-6": { alias: "Sonnet" },
       },
+      compaction: {
+        mode: "safeguard",
+      },
+      timeoutSeconds: 1800,
+      maxConcurrent: 4,
+      subagents: {
+        maxConcurrent: 4,
+      },
     },
     list: [
       {
         id: "main",
         name: "Main",
+        subagents: {
+          allowAgents: ["frontend", "backend", "reviewer"],
+        },
       },
       {
         id: "frontend",
         name: "Frontend",
+        workspace: "/home/node/.openclaw/workspace-frontend",
         model: { primary: "openai/gpt-5.4" },
       },
       {
         id: "backend",
         name: "Backend",
+        workspace: "/home/node/.openclaw/workspace-backend",
         model: { primary: "openai/gpt-5.4" },
       },
       {
         id: "reviewer",
         name: "Reviewer",
+        workspace: "/home/node/.openclaw/workspace-reviewer",
         model: { primary: "anthropic/claude-sonnet-4-6" },
       }
     ],
   },
 
+  tools: {
+    media: {
+      audio: {
+        enabled: true,
+        maxBytes: 20971520,
+        // Provider-based STT works well as a portable default.
+        // Example alternatives: Deepgram, Gemini, or a local CLI fallback.
+        models: [{ provider: "openai", model: "gpt-4o-mini-transcribe" }],
+        // Echoing the transcript can be handy, but it may be noisy in some chats.
+        echoTranscript: false,
+      },
+    },
+  },
+
+  skills: {
+    load: {
+      // Workspace-local skills live in /workspace/skills if present.
+      extraDirs: [],
+    },
+    entries: {
+      // Example: enable/configure a qmd-related skill if you add one to workspace skills.
+      // qmd: { enabled: true },
+    },
+  },
+
+  // Optional provider examples.
+  // Uncomment and adapt if you use Azure-hosted OpenAI-compatible models.
+  // models: {
+  //   providers: {
+  //     "azure-openai": {
+  //       baseUrl: "https://your-resource.openai.azure.com/openai/v1",
+  //       apiKey: "${AZUREAI_API_KEY}",
+  //       api: "openai-responses",
+  //       headers: { "api-key": "${AZUREAI_API_KEY}" },
+  //       authHeader: false,
+  //     },
+  //   },
+  // },
+
   channels: {
     discord: {
       enabled: false,
       dmPolicy: "pairing",
+      groupPolicy: "allowlist",
+      streaming: "off",
     },
     telegram: {
       enabled: false,
       dmPolicy: "pairing",
+      groupPolicy: "allowlist",
+      streaming: "partial",
     },
+    // Matrix example:
+    // matrix: {
+    //   enabled: true,
+    //   homeserver: "${MATRIX_HOMESERVER}",
+    //   accessToken: "${MATRIX_ACCESS_TOKEN}",
+    //   encryption: true,
+    //   dm: { policy: "pairing" },
+    //   groupPolicy: "allowlist",
+    // },
   },
 }

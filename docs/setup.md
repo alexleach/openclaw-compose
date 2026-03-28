@@ -38,6 +38,17 @@ openclaw doctor
 openclaw onboard
 ```
 
+## What is preconfigured in the starter
+
+The sample `openclaw/openclaw.json.example` already includes:
+
+- token auth on the gateway
+- a conservative device/node deny-list
+- a small multi-agent layout
+- provider-based audio transcription as a portable default
+
+The sample `.env.openclaw.example` also includes optional qmd and speech-related environment hints, but leaves them commented out so the overlay stays generic.
+
 ## Host project visibility
 
 The host repo is mounted at `/workspace`.

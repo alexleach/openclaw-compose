@@ -33,7 +33,7 @@ That keeps the compose file smaller and avoids fighting upstream container behav
 - `.env.openclaw.example` — environment template
 - `scripts/bootstrap.sh` — first-run bootstrap helper
 - `openclaw/openclaw.json.example` — starter OpenClaw config
-- `docs/` — setup, security, agents/channels, and secrets guidance
+- `docs/` — setup, security, recommendations, agents/channels, and secrets guidance
 
 ## Quick start
 
@@ -52,6 +52,12 @@ That will:
 ### 2. Add secrets
 
 Edit `.env.openclaw` and add whichever provider or channel credentials you actually use.
+
+The starter env file now also includes:
+
+- qmd-related env hints for retrieval-backed workflows
+- STT/TTS-related env hints
+- Azure / OpenAI-compatible provider examples
 
 ### 3. Start OpenClaw
 
@@ -126,6 +132,18 @@ This setup intentionally separates:
 
 That gives you durable sessions/config without copying your actual source tree into the OpenClaw state volume.
 
+## Included starter config
+
+The sample `openclaw/openclaw.json.example` now includes a few practical defaults:
+
+- token-authenticated gateway config
+- conservative node/device command denial
+- a small multi-agent split
+- audio transcription enabled with a portable provider-backed default
+- channel configs left disabled until you add real credentials
+
+It is meant to be useful immediately without hard-coding your personal infrastructure.
+
 ## Suggested agent layout for full-stack projects
 
 A sensible default is:
@@ -160,6 +178,7 @@ Before publishing, verify that you have not committed:
 
 - Setup: `docs/setup.md`
 - Security: `docs/security.md`
+- Recommendations: `docs/recommendations.md`
 - Secrets: `docs/secrets.md`
 - Agents and channels: `docs/agents-and-channels.md`
 - OpenClaw Docker docs: <https://docs.openclaw.ai/install/docker>
