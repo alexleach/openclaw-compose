@@ -129,5 +129,12 @@ The sample `openclaw/openclaw.json.example` includes:
 - Secrets: `docs/secrets.md`
 - Recommendations: `docs/recommendations.md`
 - Agents and channels: `docs/agents-and-channels.md`
+- Recipes:
+  - `docs/recipes/discord.md`
+  - `docs/recipes/telegram.md`
+  - `docs/recipes/tailscale.md`
+  - `docs/recipes/ollama.md`
+  - `docs/recipes/ssh-profile.md`
+  - `docs/recipes/overlay-existing-project.md`
 - OpenClaw Docker docs: <https://docs.openclaw.ai/install/docker>
 - OpenClaw config docs: <https://docs.openclaw.ai/gateway/configuration>
