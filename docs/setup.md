@@ -23,6 +23,8 @@ docker compose -f compose.yaml -f compose.openclaw.yaml exec openclaw bash
 
 ## SSH profile
 
+The compose file uses a YAML anchor for the shared OpenClaw service definition, then adds an SSH-enabled variant under the `ssh` profile.
+
 If you want the container to have access to SSH keys too:
 
 ```bash

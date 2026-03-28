@@ -16,13 +16,14 @@ It is designed to:
 
 ## Design choices
 
-This starter now stays intentionally close to the upstream OpenClaw image:
+This starter now stays intentionally close to the upstream OpenClaw image, while using a small YAML anchor to keep the SSH variant tidy:
 
 - no custom `command`
 - no custom `healthcheck`
 - no extra `HOME` / `TERM` / `TZ` defaults
 - no separate CLI sidecar by default
 - one main service, plus an SSH-profile variant when you explicitly want key access
+- YAML anchors for the shared service definition
 
 That keeps the compose file smaller and avoids fighting upstream container behavior.
 
@@ -101,7 +102,7 @@ Your comments were fair. The first draft was more defensive than necessary.
 - a separate CLI container only really helps if you want shared-network localhost access while keeping the main service immutable.
 - a third browser-oriented service was overkill for this project.
 
-For this starter, simpler is better.
+For this starter, simpler is better. YAML anchors give us a bit of DRY without introducing another compose file or `extends` quirks.
 
 ## env_file vs --env-file
 
