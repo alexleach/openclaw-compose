@@ -44,7 +44,7 @@
 
   agents: {
     defaults: {
-      workspace: "/workspace",
+      workspace: "/app",
       model: {
         primary: "openai/gpt-5.4",
         fallbacks: ["anthropic/claude-sonnet-4-6"],
@@ -73,19 +73,19 @@
       {
         id: "frontend",
         name: "Frontend",
-        workspace: "/home/node/.openclaw/workspace-frontend",
+        workspace: "/home/node/.openclaw/app-frontend",
         model: { primary: "openai/gpt-5.4" },
       },
       {
         id: "backend",
         name: "Backend",
-        workspace: "/home/node/.openclaw/workspace-backend",
+        workspace: "/home/node/.openclaw/app-backend",
         model: { primary: "openai/gpt-5.4" },
       },
       {
         id: "reviewer",
         name: "Reviewer",
-        workspace: "/home/node/.openclaw/workspace-reviewer",
+        workspace: "/home/node/.openclaw/app-reviewer",
         model: { primary: "anthropic/claude-sonnet-4-6" },
       },
     ],
@@ -105,7 +105,7 @@
 
   skills: {
     load: {
-      // Workspace-local skills live in /workspace/skills if present.
+      // Workspace-local skills live in /app/skills if present.
       extraDirs: [],
     },
     entries: {

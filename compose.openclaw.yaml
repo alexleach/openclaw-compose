@@ -7,7 +7,7 @@ x-openclaw-common: &openclaw-common
     - ./.env.openclaw
   volumes:
     - openclaw_state:/home/node/.openclaw
-    - ${OPENCLAW_PROJECT_DIR:-.}:/workspace
+    - ${OPENCLAW_PROJECT_DIR:-.}:/app
     - ${OPENCLAW_SEED_DIR:-./openclaw}:/seed/openclaw:ro
   ports:
     - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
@@ -22,7 +22,7 @@ services:
     profiles: ["ssh"]
     volumes:
       - openclaw_state:/home/node/.openclaw
-      - ${OPENCLAW_PROJECT_DIR:-.}:/workspace
+      - ${OPENCLAW_PROJECT_DIR:-.}:/app
       - ${OPENCLAW_SEED_DIR:-./openclaw}:/seed/openclaw:ro
       - ${OPENCLAW_SSH_DIR:-${HOME}/.ssh}:/home/node/.ssh:ro
 

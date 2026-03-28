@@ -51,4 +51,4 @@ The sample `.env.openclaw.example` also includes optional qmd and speech-related
 
 ## Host project visibility
 
-The host repo is mounted at `/workspace`, so OpenClaw can work directly against the checked-out project without copying source into the state volume.
+The host repo is mounted at `/app`, so OpenClaw can work directly against the checked-out project without copying source into the state volume.

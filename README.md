@@ -2,16 +2,31 @@
 
 Portable Docker Compose overlay for adding OpenClaw to an existing project.
 
-It gives you a clean OpenClaw sidecar that mounts your host repo at `/workspace`, keeps OpenClaw state in a named volume, and keeps assistant-specific config separate from your app stack.
+It gives you a clean OpenClaw sidecar that mounts your host repo at `/app`, keeps OpenClaw state in a named volume, and keeps assistant-specific config separate from your app stack.
 
 ## What you get
 
 - one main `openclaw` service
 - optional `openclaw-ssh` variant under the `ssh` profile
 - persistent OpenClaw state in a named Docker volume
-- host project mounted into `/workspace`
+- host project mounted into `/app`
 - separate OpenClaw env/config examples
 - a small bootstrap script for first run
+
+## Mental model
+
+```text
+Host project repo
+  └─ mounted at /app inside OpenClaw
+
+Compose services
+  ├─ openclaw
+  ├─ openclaw-ssh (optional)
+  └─ openclaw_state volume
+
+Chats / clients
+  └─ talk to OpenClaw
+```
 
 ## Repository layout
 
@@ -84,7 +99,7 @@ That keeps the overlay small and avoids fighting upstream container behaviour.
 This setup separates:
 
 - **OpenClaw state** in a named Docker volume
-- **project source** mounted from the host into `/workspace`
+- **project source** mounted from the host into `/app`
 
 That gives you durable sessions/config without copying your source tree into the OpenClaw state volume.
 
