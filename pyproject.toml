@@ -1,0 +1,20 @@
+[project]
+name = "openclaw-compose"
+version = "0.1.0"
+description = "Generate OpenClaw Compose overlays for existing Docker Compose projects"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "typer>=0.12,<1",
+  "PyYAML>=6.0,<7",
+]
+
+[project.scripts]
+openclaw-compose = "openclaw_compose:app"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["openclaw_compose"]
