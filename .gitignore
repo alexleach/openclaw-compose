@@ -1,15 +1,68 @@
-.env.openclaw
-.env.openclaw.local
-.env.*.local
-!.env.openclaw.example
-
-openclaw/openclaw.json
-openclaw/openclaw.json5
-openclaw/state/
-openclaw/logs/
-openclaw/sessions/
-openclaw/media/
-openclaw/tmp/
-
-*.log
+# General
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Byte-compiled / optimized / DLL files
+**/__pycache__/**
+**/*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Local environment and lock files
+.env
+uv.lock
+.venv/
+
+# Generated files
+**/_generated/*.py
+compose.openclaw.generated.yaml
+examples/**/compose.openclaw.generated.yaml
+
+# Internal documentation files
+internal/
