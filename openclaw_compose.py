@@ -20,6 +20,9 @@ DEFAULT_CONTAINER_CODEX = "/home/node/.codex"
 DEFAULT_CONTAINER_SSH = "/home/node/.ssh"
 OPENCLAW_SERVICE = "openclaw"
 OPENCLAW_IMAGE = "ghcr.io/openclaw/openclaw:latest"
+OPENCLAW_SEED_SERVICE = "openclaw-seed"
+OPENCLAW_SEED_MOUNT = "/seed-openclaw"
+OPENCLAW_HOME_VOLUME = "openclaw-home"
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
@@ -116,17 +119,33 @@ def _build_context(service: dict[str, Any], compose_path: Path) -> str:
     return str(_compose_dir(compose_path))
 
 
-def _dockerfile_inline(base_image: str, mount_ssh: bool) -> str:
-    ssh_lines = "\nRUN mkdir -p /home/node/.ssh && chmod 700 /home/node/.ssh" if mount_ssh else ""
-    return textwrap.dedent(
-        f"""
-        FROM {base_image}
+def _dockerfile_inline(base_image: str, mount_ssh: bool, copy_certs: bool = False) -> str:
+    lines = [
+        f"FROM {base_image}",
+        "",
+        "USER root",
+        "RUN apt update \\",
+        "    && apt install -y \\",
+        "        build-essential \\",
+        "        ca-certificates \\",
+        "        git",
+        "",
+    ]
 
-        USER root
-        RUN python3 -m pip install --no-cache-dir {OPENCLAW_IMAGE}{ssh_lines}
-        USER node
-        """
-    ).strip() + "\n"
+    if copy_certs:
+        lines.extend([
+            "COPY certs/*.crt /usr/local/share/ca-certificates/",
+            "RUN update-ca-certificates",
+            "",
+        ])
+
+    lines.append("RUN npm install -g openclaw")
+
+    if mount_ssh:
+        lines.extend(["", "RUN mkdir -p /home/node/.ssh && chmod 700 /home/node/.ssh"])
+
+    lines.extend(["", "USER node", "WORKDIR /home/node"])
+    return "\n".join(lines) + "\n"
 
 
 def build_overlay(
@@ -137,6 +156,7 @@ def build_overlay(
     mount_codex: bool,
     mount_claude: bool,
     mount_ssh: bool,
+    openclaw_home_volume: str = OPENCLAW_HOME_VOLUME,
 ) -> dict[str, Any]:
     compose = _load_yaml(compose_path)
     services = compose.get("services", {})
@@ -149,7 +169,7 @@ def build_overlay(
         raise typer.BadParameter(f"service {target_service!r} is malformed")
 
     base_volumes = [_normalize_volume(v) for v in base.get("volumes", []) if v is not None]
-    extra_volumes: list[Any] = [_bind(host_openclaw_home, DEFAULT_CONTAINER_OPENCLAW_HOME)]
+    extra_volumes: list[Any] = []
 
     if mount_bashrc:
         extra_volumes.append(_bind(Path.home() / ".bashrc", DEFAULT_CONTAINER_BASHRC, read_only=True))
@@ -168,7 +188,7 @@ def build_overlay(
         "extends": {"file": compose_path.name, "service": target_service},
         "build": {
             "context": _build_context(base, compose_path),
-            "dockerfile_inline": _dockerfile_inline(base_image, mount_ssh),
+            "dockerfile_inline": _dockerfile_inline(base_image, mount_ssh, copy_certs=True),
         },
         "volumes": _merge_unique_volumes(base_volumes, extra_volumes),
     }
@@ -182,7 +202,36 @@ def build_overlay(
     if "user" in base:
         overlay_service["user"] = base["user"]
 
-    return {"name": "openclaw-compose", "services": {OPENCLAW_SERVICE: overlay_service}}
+    overlay: dict[str, Any] = {
+        "name": "openclaw-compose",
+        "services": {
+            OPENCLAW_SEED_SERVICE: {
+                "image": "alpine:3.20",
+                "command": [
+                    "sh",
+                    "-lc",
+                    f"if [ -z \"$(find {OPENCLAW_SEED_MOUNT} -mindepth 1 -maxdepth 1 2>/dev/null)\" ]; then cp -a {OPENCLAW_SEED_MOUNT}/. {DEFAULT_CONTAINER_OPENCLAW_HOME}/; fi",
+                ],
+                "volumes": [
+                    {"type": "bind", "source": str(host_openclaw_home), "target": OPENCLAW_SEED_MOUNT, "read_only": True},
+                    {"type": "volume", "source": openclaw_home_volume, "target": DEFAULT_CONTAINER_OPENCLAW_HOME},
+                ],
+            },
+            OPENCLAW_SERVICE: overlay_service,
+        },
+    }
+
+    volumes: dict[str, Any] = {openclaw_home_volume: {}}
+    compose_volumes = compose.get("volumes")
+    if isinstance(compose_volumes, dict) and compose_volumes:
+        volumes.update(compose_volumes)
+    overlay["volumes"] = volumes
+
+    networks = compose.get("networks")
+    if isinstance(networks, dict) and networks:
+        overlay["networks"] = networks
+
+    return overlay
 
 
 @app.callback(invoke_without_command=True)
